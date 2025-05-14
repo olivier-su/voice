@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import invariant from 'invariant';
 import {
+<<<<<<< HEAD
   type SpeechEvents,
   type TranscriptionEvents,
   type TranscriptionEndEvent,
@@ -18,6 +19,21 @@ import {
   type SpeechEndEvent,
   type SpeechVolumeChangeEvent,
   type TranscriptionResultsEvent,
+=======
+  VoiceModule,
+  SpeechEvents,
+  TranscriptionEvents,
+  TranscriptionEndEvent,
+  TranscriptionErrorEvent,
+  TranscriptionStartEvent,
+  SpeechRecognizedEvent,
+  SpeechErrorEvent,
+  SpeechResultsEvent,
+  SpeechStartEvent,
+  SpeechEndEvent,
+  SpeechVolumeChangeEvent,
+  TranscriptionResultsEvent,
+>>>>>>> pr-409
 } from './VoiceModuleTypes';
 
 const LINKING_ERROR =
@@ -53,9 +69,15 @@ type SpeechEvent = keyof SpeechEvents;
 type TranscriptionEvent = keyof TranscriptionEvents;
 
 class RCTVoice {
+<<<<<<< HEAD
   private _loaded: boolean;
   private _listeners: EventSubscription[];
   private _events: Required<SpeechEvents> & Required<TranscriptionEvents>;
+=======
+  _loaded: boolean;
+  _listeners: any[] | null;
+  _events: Required<SpeechEvents> & Required<TranscriptionEvents>;
+>>>>>>> pr-409
 
   constructor() {
     this._loaded = false;
@@ -76,6 +98,7 @@ class RCTVoice {
   }
 
   removeAllListeners() {
+<<<<<<< HEAD
     if (this._listeners) {
       this._listeners.forEach((listener) => {
         if (listener?.remove) {
@@ -85,6 +108,19 @@ class RCTVoice {
 
       this._listeners = JSON.parse(JSON.stringify([]));
     }
+=======
+    Voice.onSpeechStart = undefined;
+    Voice.onSpeechRecognized = undefined;
+    Voice.onSpeechEnd = undefined;
+    Voice.onSpeechError = undefined;
+    Voice.onSpeechResults = undefined;
+    Voice.onSpeechPartialResults = undefined;
+    Voice.onSpeechVolumeChanged = undefined;
+    Voice.onTranscriptionStart = undefined;
+    Voice.onTranscriptionEnd = undefined;
+    Voice.onTranscriptionError = undefined;
+    Voice.onTranscriptionResults = undefined;
+>>>>>>> pr-409
   }
 
   destroy() {
@@ -114,6 +150,24 @@ class RCTVoice {
           if (this._listeners?.length > 0) {
             this._listeners.forEach((listener) => listener.remove());
             this._listeners = JSON.parse(JSON.stringify([]));
+          }
+          resolve();
+        }
+      });
+    });
+  }
+  destroyTranscription() {
+    if (!this._loaded && !this._listeners) {
+      return Promise.resolve();
+    }
+    return new Promise<void>((resolve, reject) => {
+      Voice.destroyTranscription((error: string) => {
+        if (error) {
+          reject(new Error(error));
+        } else {
+          if (this._listeners) {
+            this._listeners.map(listener => listener.remove());
+            this._listeners = null;
           }
           resolve();
         }
@@ -159,7 +213,11 @@ class RCTVoice {
       }
     });
   }
+<<<<<<< HEAD
   startTranscription(url: string, locale: string, options = {}) {
+=======
+  startTranscription(url: any, locale: any, options = {}) {
+>>>>>>> pr-409
     if (!this._loaded && !this._listeners && voiceEmitter !== null) {
       this._listeners = (Object.keys(this._events) as TranscriptionEvent[]).map(
         (key: TranscriptionEvent) =>
@@ -223,6 +281,20 @@ class RCTVoice {
       });
     });
   }
+  stopTranscription() {
+    if (!this._loaded && !this._listeners) {
+      return Promise.resolve();
+    }
+    return new Promise<void>((resolve, reject) => {
+      Voice.stopTranscription(error => {
+        if (error) {
+          reject(new Error(error));
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
   cancel() {
     if (!this._loaded && !this._listeners) {
       return Promise.resolve();
@@ -243,6 +315,20 @@ class RCTVoice {
     }
     return new Promise<void>((resolve, reject) => {
       Voice.cancelSpeech((error?: string) => {
+        if (error) {
+          reject(new Error(error));
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+  cancelTranscription() {
+    if (!this._loaded && !this._listeners) {
+      return Promise.resolve();
+    }
+    return new Promise<void>((resolve, reject) => {
+      Voice.cancelSpeech(error => {
         if (error) {
           reject(new Error(error));
         } else {
